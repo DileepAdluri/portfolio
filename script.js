@@ -1,58 +1,107 @@
-```javascript
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
 
-    // Smooth scrolling for navigation links
-    const navLinks = document.querySelectorAll(".nav-container nav a");
+    const revealElements = document.querySelectorAll(
+        ".content-section, .project-featured, .skill-card, .project-row, .experience-item"
+    );
 
-    navLinks.forEach(function (link) {
-        link.addEventListener("click", function (event) {
+    const observer = new IntersectionObserver(
+        (entries) => {
 
-            const targetId = this.getAttribute("href");
+            entries.forEach((entry) => {
 
-            if (targetId.startsWith("#")) {
-                event.preventDefault();
-
-                const targetSection = document.querySelector(targetId);
-
-                if (targetSection) {
-                    targetSection.scrollIntoView({
-                        behavior: "smooth"
-                    });
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("reveal");
+                    observer.unobserve(entry.target);
                 }
-            }
-        });
+
+            });
+
+        },
+        {
+            threshold: 0.12
+        }
+    );
+
+    revealElements.forEach((element) => {
+        observer.observe(element);
     });
 
 
-    // Highlight the active navigation link
-    const sections = document.querySelectorAll("section[id]");
+    const navigationLinks = document.querySelectorAll(
+        ".nav-links a, .mobile-nav a"
+    );
 
-    window.addEventListener("scroll", function () {
+    navigationLinks.forEach((link) => {
 
-        let currentSection = "";
+        link.addEventListener("click", (event) => {
 
-        sections.forEach(function (section) {
+            const targetId = link.getAttribute("href");
 
-            const sectionTop = section.offsetTop - 150;
-            const sectionHeight = section.offsetHeight;
-
-            if (
-                window.scrollY >= sectionTop &&
-                window.scrollY < sectionTop + sectionHeight
-            ) {
-                currentSection = section.getAttribute("id");
+            if (!targetId || !targetId.startsWith("#")) {
+                return;
             }
+
+            const target = document.querySelector(targetId);
+
+            if (!target) {
+                return;
+            }
+
+            event.preventDefault();
+
+            target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+
+            /*
+             * Keep the browser URL clean.
+             * No #about, #skills, #projects, etc.
+             */
+            history.replaceState(null, "", window.location.pathname);
+
         });
 
-        navLinks.forEach(function (link) {
-
-            link.classList.remove("active");
-
-            if (link.getAttribute("href") === "#" + currentSection) {
-                link.classList.add("active");
-            }
-        });
     });
+
+
+    const brand = document.querySelector(".brand");
+
+    if (brand) {
+
+        brand.addEventListener("click", (event) => {
+
+            event.preventDefault();
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+            history.replaceState(null, "", window.location.pathname);
+        });
+
+    }
+
+
+    const backToTop = document.querySelector(
+        'footer a[href="#home"]'
+    );
+
+    if (backToTop) {
+
+        backToTop.addEventListener("click", (event) => {
+
+            event.preventDefault();
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+            history.replaceState(null, "", window.location.pathname);
+        });
+
+    }
 
 });
-```
